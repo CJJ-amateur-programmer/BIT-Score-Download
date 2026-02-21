@@ -1,15 +1,17 @@
 // ==UserScript==
 // @name         BIT-Score-Download
 // @namespace    CJJ
-// @version      0.1
+// @version      0.2
 // @description  Download your score
 // @author       You
 // @match        https://jwms.bit.edu.cn/jsxsd/kscj/cjcx_list
+// @match        https://webvpn.bit.edu.cn/http/77726476706e69737468656265737421fae04c8f69326144300d8db9d6562d/jsxsd/kscj/cjcx_list
 // @icon         none
 // @grant        GM_registerMenuCommand
 // ==/UserScript==
 
 (function() {
+    /* global vpn_parsers*/
     'use strict';
     GM_registerMenuCommand('成绩导出',async function(){
         const downloadLink = document.createElement("a");
@@ -23,8 +25,11 @@
                     let row_data = Array.from(row.querySelectorAll("td")).map(e => e.innerText);
                     row_data.pop();
                     console.log("Processing ", row_data[3]);
-                    const url = row.querySelector("a[href][onclick]")?.onclick?.toString()?.match(/(?<=JsMod\(').*?(?=')/)[0];
+                    let url = row.querySelector("a[href][onclick]")?.onclick?.toString()?.match(/(?<=JsMod\(').*?(?=')/)[0];
                     if(url){
+                        if(typeof vpn_parsers !== 'undefined'){
+                            url = vpn_parsers.baseUrl.parse(url)
+                        }
                         const text = await fetch(url).then(res=>res.text());
                         row_data.push(text.match(/(?<=平均分[^\w]*?)[\w]+/)?.join());//平均分
                         row_data.push(text.match(/(?<=最高分[^\w]*?)[\w]+/)?.join());//最高分
