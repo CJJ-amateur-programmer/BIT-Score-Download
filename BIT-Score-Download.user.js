@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         BIT-Score-Download
 // @namespace    CJJ
-// @version      0.2
+// @version      0.3
 // @description  Download your score
 // @author       You
 // @match        https://jwms.bit.edu.cn/jsxsd/kscj/cjcx_list
@@ -49,8 +49,10 @@
                     return row_data.join();
                 })
         );
+        // Add the BOM (Byte Order Mark) for UTF-8
+        const BOM = '\uFEFF';
         const content = `${thead}\n${tbody.join("\n")}`;
-        downloadLink.href = URL.createObjectURL(new Blob([content],{type:"text/plain"}));//创建txt
+        downloadLink.href = URL.createObjectURL(new Blob([BOM + content],{type:"text/plain"}));//创建txt
         downloadLink.click();
         document.write(csv2table(content));
     });
